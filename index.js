@@ -61,6 +61,16 @@ async function run() {
       const result = await blogsCollection.updateOne(query, updateDoc, options);
       res.json(result);
     });
+
+    // delete single blog
+    app.delete("/blogs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await blogsCollection.deleteOne(query);
+      console.log("hit delete", result);
+
+      res.json(result);
+    });
   } finally {
     // await client.close();
   }
