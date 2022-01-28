@@ -63,8 +63,23 @@ async function run() {
     // GET API
     app.get("/blogs", async (req, res) => {
       const cursor = blogsCollection.find({});
-      const blog = await cursor.toArray();
-      res.json(blog);
+      const count = await cursor.count();
+      const page = req.query.page;
+      const size = parseInt(req.query.size);
+      let blogs;
+      // console.log(req.query);
+      if (page) {
+        blogs = await cursor
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+      } else {
+        blogs = await cursor.toArray();
+      }
+      res.json({
+        count,
+        blogs,
+      });
     });
     // get single blog
     app.get("/blogs/:id", async (req, res) => {
@@ -95,8 +110,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await blogsCollection.deleteOne(query);
-      console.log("hit delete", result);
-
+      // console.log("hit delete", result);
       res.json(result);
     });
   } finally {
